@@ -59,15 +59,15 @@ function M.get_complete_fn(complete_opts)
         end
 
         local items = {}
-        for _, jira_issue in ipairs(parsed.issues) do
-          jira_issue.body = string.gsub(jira_issue.body or '', '\r', '')
+        for _, issue in ipairs(parsed.issues) do
+          issue.body = string.gsub(issue.body or '', '\r', '')
 
           table.insert(items, {
-            label = string.format(complete_opts.item_format, jira_issue.key),
+            label = string.format(complete_opts.item_format, issue.key),
             documentation = {
               kind = 'plaintext',
-              value = string.format('[%s] %s\n\n%s', jira_issue.key, jira_issue.fields.summary,
-                jira_issue.fields.description),
+              value = string.format('[%s] %s\n\n%s', issue.key, issue.fields.summary,
+                issue.fields.description),
             },
           })
         end
