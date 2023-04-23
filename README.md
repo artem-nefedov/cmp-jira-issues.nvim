@@ -54,11 +54,25 @@ Make sure to call `setup` when plenary and nvim-cmp are already loaded.
 
 ### Default configuration
 
+Create/update ".lua" file in `~/.config/nvim/after/plugin/` with contents:
+
 ```lua
 require('cmp-jira-issues').setup({})
 ```
 
-Don't forget to add completion source (default: `jira_issues`) to cmp `setup`.
+Don't forget to add completion source (default: `jira_issues`) to cmp `setup`, e.g.:
+
+```lua
+local cmp = require('cmp')
+
+cmp.setup({
+  -- other options
+  sources = {
+    { name = 'jira_issues' },
+    -- other sources
+  },
+})
+```
 
 ### Custom custom configuration
 
