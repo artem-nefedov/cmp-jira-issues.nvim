@@ -3,7 +3,7 @@ local M = {}
 local registered = false
 
 function M.setup(opts)
-  local config = require('jira-commit-cmp.config')
+  local config = require('cmp-jira-issues.config')
 
   if opts.is_available ~= nil then
     config.source.is_available = opts.is_available
