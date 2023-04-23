@@ -118,4 +118,4 @@ You can change the behavior by implementing your own caching mechanics using
 ## Troubleshooting
 
 If curl doesn't return correct results, debug it by running it in local shell
-with the same arguments as seen in [config.lua](lua/cmp-jira-issues/config.lua).
+with the same arguments as seen in [complete.lua](lua/cmp-jira-issues/complete.lua).

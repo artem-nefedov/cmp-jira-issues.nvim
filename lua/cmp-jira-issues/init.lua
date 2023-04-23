@@ -3,14 +3,20 @@ local M = {}
 local registered = false
 
 function M.setup(opts)
-  local config = require('cmp-jira-issues.config')
+  local source = {}
 
-  if opts.is_available ~= nil then
-    config.source.is_available = opts.is_available
+  source.new = function()
+    local self = setmetatable({ cache = {} }, { __index = source })
+    return self
   end
 
-  if opts.get_trigger_characters ~= nil then
-    config.source.get_trigger_characters = opts.get_trigger_characters
+  source.get_trigger_characters = opts.get_trigger_characters or function()
+    return { '[' }
+  end
+
+  source.is_available = opts.is_available or function()
+    return vim.bo.filetype == 'gitcommit' or
+        (vim.bo.filetype == 'markdown' and vim.fs.basename(vim.api.nvim_buf_get_name(0)) == 'CHANGELOG.md')
   end
 
   if opts.complete_opts == nil then
@@ -36,10 +42,10 @@ function M.setup(opts)
     end
   end
 
-  config.source.complete = config.get_complete_fn(opts.complete_opts)
+  source.complete = require('cmp-jira-issues.complete').get_complete_fn(opts.complete_opts)
 
   if not registered then
-    require('cmp').register_source(opts.source_name or 'jira_issues', config.source.new())
+    require('cmp').register_source(opts.source_name or 'jira_issues', source.new())
     registered = true
   end
 end

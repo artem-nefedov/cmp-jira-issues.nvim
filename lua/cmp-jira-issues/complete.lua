@@ -2,25 +2,9 @@ local M = {}
 
 local Job = require('plenary.job')
 
-M.source = {}
-
 local enabled = true
 
-function M.source.new()
-  local self = setmetatable({ cache = {} }, { __index = M.source })
-  return self
-end
-
-function M.source.get_trigger_characters()
-  return { '[' }
-end
-
-function M.source.is_available()
-  return vim.bo.filetype == 'gitcommit' or
-      (vim.bo.filetype == 'markdown' and vim.fs.basename(vim.api.nvim_buf_get_name(0)) == 'CHANGELOG.md')
-end
-
-function M.get_complete_fn(complete_opts)
+M.get_complete_fn = function(complete_opts)
   return function(self, _, callback)
     if not enabled then
       return
