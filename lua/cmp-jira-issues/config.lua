@@ -21,19 +21,6 @@ function M.source.is_available()
 end
 
 function M.get_complete_fn(complete_opts)
-  local curl_config = vim.fn.expand(complete_opts.curl_config or '~/.jira-curl-config')
-
-  local item_format = complete_opts.item_format or '[%s] '
-
-  local get_cache = complete_opts.get_cache or function(self, bufnr)
-    return self.cache[bufnr] or vim.t.cached_jira_issues
-  end
-
-  local set_cache = complete_opts.set_cache or function(self, bufnr, items)
-    self.cache[bufnr] = items
-    vim.t.cached_jira_issues = items
-  end
-
   return function(self, _, callback)
     if not enabled then
       return
@@ -41,7 +28,7 @@ function M.get_complete_fn(complete_opts)
 
     local bufnr = vim.api.nvim_get_current_buf()
 
-    local cached = get_cache(self, bufnr)
+    local cached = complete_opts.get_cache(self, bufnr)
     if cached ~= nil then
       callback({ items = cached, isIncomplete = false })
       return
@@ -56,7 +43,7 @@ function M.get_complete_fn(complete_opts)
       '--data-urlencode',
       'fields=summary,description',
       '--config',
-      curl_config,
+      complete_opts.curl_config,
       on_exit = function(job)
         local result = job:result()
         local ok, parsed = pcall(vim.json.decode, table.concat(result, ''))
@@ -76,7 +63,7 @@ function M.get_complete_fn(complete_opts)
           jira_issue.body = string.gsub(jira_issue.body or '', '\r', '')
 
           table.insert(items, {
-            label = string.format(item_format, jira_issue.key),
+            label = string.format(complete_opts.item_format, jira_issue.key),
             documentation = {
               kind = 'plaintext',
               value = string.format('[%s] %s\n\n%s', jira_issue.key, jira_issue.fields.summary,
@@ -87,7 +74,7 @@ function M.get_complete_fn(complete_opts)
 
         callback({ items = items, isIncomplete = false })
 
-        set_cache(self, bufnr, items)
+        complete_opts.set_cache(self, bufnr, items)
       end,
     }):start()
   end
