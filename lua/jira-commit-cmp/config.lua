@@ -23,11 +23,9 @@ end
 function M.get_complete_fn(complete_opts)
   local curl_config = complete_opts.curl_config or vim.env['HOME'] .. '/.jira-config'
 
-  return function(self, _, callback)
-    if not enabled then
-      return
-    end
+  local item_format = complete_opts.item_format or '[%s] '
 
+  local get_cache = complete_opts.get_cache or function(self)
     local bufnr = vim.api.nvim_get_current_buf()
     local cached = self.cache[bufnr]
 
@@ -35,6 +33,21 @@ function M.get_complete_fn(complete_opts)
       cached = vim.t.cached_jira_issues
     end
 
+    return cached
+  end
+
+  local set_cache = complete_opts.set_cache or function(self, items)
+    local bufnr = vim.api.nvim_get_current_buf()
+    self.cache[bufnr] = items
+    vim.t.cached_jira_issues = items
+  end
+
+  return function(self, _, callback)
+    if not enabled then
+      return
+    end
+
+    local cached = get_cache(self)
     if cached ~= nil then
       callback({ items = cached, isIncomplete = false })
       return
@@ -52,8 +65,6 @@ function M.get_complete_fn(complete_opts)
       curl_config,
       on_exit = function(job)
         local result = job:result()
-        print(vim.inspect(job))
-        print(vim.inspect(table.concat(result, '')))
         local ok, parsed = pcall(vim.json.decode, table.concat(result, ''))
 
         if not ok then
@@ -68,10 +79,10 @@ function M.get_complete_fn(complete_opts)
 
         local items = {}
         for _, jira_issue in ipairs(parsed.issues) do
-          jira_issue.body = string.gsub(jira_issue.body or '', '\r"', '')
+          jira_issue.body = string.gsub(jira_issue.body or '', '\r', '')
 
           table.insert(items, {
-            label = string.format('[%s] ', jira_issue.key),
+            label = string.format(item_format, jira_issue.key),
             documentation = {
               kind = 'plaintext',
               value = string.format('[%s] %s\n\n%s', jira_issue.key, jira_issue.fields.summary,
@@ -82,8 +93,7 @@ function M.get_complete_fn(complete_opts)
 
         callback({ items = items, isIncomplete = false })
 
-        self.cache[bufnr] = items
-        vim.t.cached_jira_issues = items
+        set_cache(self, items)
       end,
     }):start()
   end
