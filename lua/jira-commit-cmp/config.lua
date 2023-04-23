@@ -21,7 +21,7 @@ function M.source.is_available()
 end
 
 function M.get_complete_fn(complete_opts)
-  local curl_config = complete_opts.curl_config or vim.env['HOME'] .. '/.jira-config'
+  local curl_config = complete_opts.curl_config or vim.env['HOME'] .. '/.jira-curl-config'
 
   local item_format = complete_opts.item_format or '[%s] '
 
