@@ -2,6 +2,9 @@
 
 Auto-complete Jira issue keys based on arbitrary query.
 
+Based on [cmp_gh_source](https://github.com/tjdevries/config_manager/blob/master/xdg_config/nvim/after/plugin/cmp_gh_source.lua)
+example by TJ DeVries.
+
 ## Prerequisites
 
 - Using NeoVim (tested with 0.9.0 on unix-like environment)
