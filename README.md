@@ -39,7 +39,7 @@ The file will be passed to curl's `--config` option as-is.
 
 ### Example curl config contents
 
-This example shows how to get issues assigned to you for completion:
+This example shows how to get open issues assigned to you for completion:
 
 ```
 url = "https://your-jira-server/rest/api/2/search"
