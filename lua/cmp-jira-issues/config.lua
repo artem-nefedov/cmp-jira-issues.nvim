@@ -50,6 +50,7 @@ function M.get_complete_fn(complete_opts)
 
         if not ok then
           enabled = false
+          print('bad response from curl after querying jira')
           return
         end
 

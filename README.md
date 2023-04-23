@@ -114,3 +114,8 @@ you will get pre-fetched issue list. There is no cache invalidation.
 You can change the behavior by implementing your own caching mechanics using
 `get_cache` and `set_cache` callbacks. To disable cache completely, pass
 `get_cache` function that always returns `nil`.
+
+## Troubleshooting
+
+If curl doesn't return correct results, debug it by running it in local shell
+with the same arguments as seen in [config.lua](lua/cmp-jira-issues/config.lua).
