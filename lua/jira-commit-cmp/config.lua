@@ -25,19 +25,11 @@ function M.get_complete_fn(complete_opts)
 
   local item_format = complete_opts.item_format or '[%s] '
 
-  local get_cache = complete_opts.get_cache or function(self)
-    local bufnr = vim.api.nvim_get_current_buf()
-    local cached = self.cache[bufnr]
-
-    if cached == nil then
-      cached = vim.t.cached_jira_issues
-    end
-
-    return cached
+  local get_cache = complete_opts.get_cache or function(self, bufnr)
+    return self.cache[bufnr] or vim.t.cached_jira_issues
   end
 
-  local set_cache = complete_opts.set_cache or function(self, items)
-    local bufnr = vim.api.nvim_get_current_buf()
+  local set_cache = complete_opts.set_cache or function(self, bufnr, items)
     self.cache[bufnr] = items
     vim.t.cached_jira_issues = items
   end
@@ -47,7 +39,9 @@ function M.get_complete_fn(complete_opts)
       return
     end
 
-    local cached = get_cache(self)
+    local bufnr = vim.api.nvim_get_current_buf()
+
+    local cached = get_cache(self, bufnr)
     if cached ~= nil then
       callback({ items = cached, isIncomplete = false })
       return
@@ -93,7 +87,7 @@ function M.get_complete_fn(complete_opts)
 
         callback({ items = items, isIncomplete = false })
 
-        set_cache(self, items)
+        set_cache(self, bufnr, items)
       end,
     }):start()
   end
