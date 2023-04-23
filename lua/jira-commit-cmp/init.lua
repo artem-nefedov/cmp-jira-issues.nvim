@@ -1,5 +1,7 @@
 local M = {}
 
+local registered = false
+
 function M.setup(opts)
   local config = require('jira-commit-cmp.config')
 
@@ -13,7 +15,10 @@ function M.setup(opts)
 
   config.source.complete = config.get_complete_fn(opts.complete_opts or {})
 
-  require('cmp').register_source(opts.source_name or 'jira_issues', config.source.new())
+  if not registered then
+    require('cmp').register_source(opts.source_name or 'jira_issues', config.source.new())
+    registered = true
+  end
 end
 
 return M
