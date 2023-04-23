@@ -5,6 +5,7 @@ Auto-complete Jira issue keys based on arbitrary query.
 ## Prerequisites
 
 - Using NeoVim (tested with 0.9.0 on unix-like environment)
+- Access to Jira-Server REST API (not tested with Jira-Cloud)
 - [curl](https://curl.se/) is installed and is available in `$PATH`
 - [nvim-cmp](https://github.com/hrsh7th/nvim-cmp) and [plenary.nvim](https://github.com/nvim-lua/plenary.nvim) are installed
   (both must be loaded before `setup` is called)
