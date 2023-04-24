@@ -36,7 +36,7 @@ contain at least the following options:
 
 - `url` - value must point to your Jira server's `/rest/api/2/search` endpoint
 - `data-urlencode` - value must have `jql=<your issue search query>`
-- any other options required to authenticate to your Jira server (`cookie`, `user`, etc.)
+- any other options required to authenticate to your Jira server (`header`, `cookie`, `user`, etc.)
 
 The file will be passed to curl's `--config` option as-is.
 
@@ -49,6 +49,7 @@ url = "https://your-jira-server/rest/api/2/search"
 data-urlencode = "jql=assignee = \"your-acc-name\" and resolution = unresolved"
 user = "username:password"
 # instead of "user", you can use any other option that can control authentication
+# e.g. header = "Authorization: Bearer <your-personal-access-token>"
 ```
 
 ## Setup
