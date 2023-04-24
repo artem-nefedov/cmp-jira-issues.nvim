@@ -91,15 +91,17 @@ require('cmp-jira-issues').setup({
     return vim.bo.filetype == 'gitcommit' or
         (vim.bo.filetype == 'markdown' and vim.fs.basename(vim.api.nvim_buf_get_name(0)) == 'CHANGELOG.md')
   end,
+  clear_cache = function() -- set to boolean false value to disable user command creation
+    vim.g.cached_jira_issues = nil
+  end,
   complete_opts = {
     curl_config = '~/.jira-curl-config', -- value is passed to `:h expand()`
     item_format = '[%s] ', -- must contain exactly one %s in the string
-    get_cache = function(self, bufnr)
-      return self.cache[bufnr] or vim.t.cached_jira_issues
+    get_cache = function(_, _)
+      return vim.g.cached_jira_issues
     end,
-    set_cache = function(self, bufnr, items)
-      self.cache[bufnr] = items
-      vim.t.cached_jira_issues = items
+    set_cache = function(_, _, items)
+      vim.g.cached_jira_issues = items
     end,
   },
 })
@@ -107,13 +109,30 @@ require('cmp-jira-issues').setup({
 
 ## Caching
 
-By default, response from server is cached for both current buffer and current tab,
-meaning if you open another window in the same tab, or if you open same buffer anywhere,
-you will get pre-fetched issue list. There is no cache invalidation.
+By default, response from server is cached globally for the entire session duration,
+and `JiraClearCache` user command is provided to clear cached results.
 
 You can change the behavior by implementing your own caching mechanics using
-`get_cache` and `set_cache` callbacks. To disable cache completely, pass
-`get_cache` function that always returns `nil`.
+`get_cache`, `set_cache`, and `clear_cache` callbacks.
+
+- `get_cache` receives 2 arguments: `self` table and `bufnr` integer
+- `set_cache` receives 3 arguments: `self` table, `bufnr` integer, and `items` table
+- `clear_cache` doesn't receive anything and gets called by `JiraClearCache` command
+
+To implement buffer local cache, use the following definitions
+(note that it makes `clear_cache` useless):
+
+```lua
+get_cache = function(self, bufnr)
+  return self.cache[bufnr]
+end
+
+set_cache = function(self, bufnr, items)
+  self.cache[bufnr] = items
+end
+```
+
+To disable cache completely, pass `get_cache` function that always returns `nil`.
 
 ## Troubleshooting
 

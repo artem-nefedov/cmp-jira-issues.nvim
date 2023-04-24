@@ -19,6 +19,11 @@ function M.setup(opts)
         (vim.bo.filetype == 'markdown' and vim.fs.basename(vim.api.nvim_buf_get_name(0)) == 'CHANGELOG.md')
   end
 
+  -- separate treatment of nil and false
+  local clear_cache = opts.clear_cache ~= nil and opts.clear_cache or function()
+    vim.g.cached_jira_issues = nil
+  end
+
   if opts.complete_opts == nil then
     opts.complete_opts = {}
   end
@@ -30,15 +35,14 @@ function M.setup(opts)
   end
 
   if opts.complete_opts.get_cache == nil then
-    opts.complete_opts.get_cache = function(self, bufnr)
-      return self.cache[bufnr] or vim.t.cached_jira_issues
+    opts.complete_opts.get_cache = function(_, _)
+      return vim.g.cached_jira_issues
     end
   end
 
   if opts.complete_opts.set_cache == nil then
-    opts.complete_opts.set_cache = function(self, bufnr, items)
-      self.cache[bufnr] = items
-      vim.t.cached_jira_issues = items
+    opts.complete_opts.set_cache = function(_, _, items)
+      vim.g.cached_jira_issues = items
     end
   end
 
@@ -46,6 +50,11 @@ function M.setup(opts)
 
   if not registered then
     require('cmp').register_source(opts.source_name or 'jira_issues', source.new())
+
+    if clear_cache ~= false then
+      vim.api.nvim_create_user_command('JiraClearCache', clear_cache, { desc = 'Clear cache for Jira issue completion' })
+    end
+
     registered = true
   end
 end
