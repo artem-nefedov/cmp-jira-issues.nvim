@@ -120,7 +120,7 @@ You can change the behavior by implementing your own caching mechanics using
 - `clear_cache` doesn't receive anything and gets called by `JiraClearCache` command
 
 To implement buffer local cache, use the following definitions
-(note that it makes `clear_cache` useless):
+(note that it makes `clear_cache` useless - set it to `false` to disable user command creation):
 
 ```lua
 get_cache = function(self, bufnr)
