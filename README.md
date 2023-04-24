@@ -1,6 +1,6 @@
 # cmp-jira-issues
 
-Auto-complete Jira issue keys based on arbitrary query.
+Extend nvim-cmp to auto-complete Jira issue keys.
 
 Based on [cmp_gh_source](https://github.com/tjdevries/config_manager/blob/master/xdg_config/nvim/after/plugin/cmp_gh_source.lua)
 example by TJ DeVries.
