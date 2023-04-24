@@ -10,16 +10,20 @@ function M.setup(opts)
     return self
   end
 
-  source.get_trigger_characters = opts.get_trigger_characters or function()
-    return { '[' }
-  end
-
-  source.is_available = opts.is_available or function()
-    return vim.bo.filetype == 'gitcommit' or
-        (vim.bo.filetype == 'markdown' and vim.fs.basename(vim.api.nvim_buf_get_name(0)) == 'CHANGELOG.md')
-  end
-
   -- separate treatment of nil and false
+  if opts.get_trigger_characters ~= false then
+    source.get_trigger_characters = opts.get_trigger_characters or function()
+      return { '[' }
+    end
+  end
+
+  if opts.is_available ~= false then
+    source.is_available = opts.is_available or function()
+      return vim.bo.filetype == 'gitcommit' or
+          (vim.bo.filetype == 'markdown' and vim.fs.basename(vim.api.nvim_buf_get_name(0)) == 'CHANGELOG.md')
+    end
+  end
+
   local clear_cache = opts.clear_cache ~= nil and opts.clear_cache or function()
     vim.g.cached_jira_issues = nil
   end
