@@ -2,7 +2,7 @@ local M = {}
 
 local registered = false
 
-function M.setup(opts)
+M.setup = function(opts)
   local source = {}
 
   source.new = function()
