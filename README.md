@@ -142,6 +142,8 @@ You can change the behavior by implementing your own caching mechanics using
 - `complete_opt.set_cache` receives 3 arguments: `self` table, `bufnr` integer, and `items` table
 - `clear_cache` doesn't receive anything and gets called by `JiraClearCache` command
 
+Furthermore, `self` table has child `cache` table created by default.
+
 To implement buffer local cache, use the following definitions
 (note that it makes `clear_cache` useless - set it to `false` to disable user command creation):
 
