@@ -99,7 +99,8 @@ require('cmp-jira-issues').setup({
   complete_opts = {
     curl_config = '~/.jira-curl-config', -- value is passed to `:h expand()`
     items = { -- what fields to lookup and how to format them
-      { '[%s] %s', { root = { 'key' }, fields = { 'summary' } } },
+      { '[%s] ',   { root = { 'key' }, fields = {} } }, -- keys only
+      { '[%s] %s', { root = { 'key' }, fields = { 'summary' } } }, -- keys + summary
     }
     get_cache = function(_, _)
       return vim.g.cached_jira_issues
@@ -114,11 +115,10 @@ require('cmp-jira-issues').setup({
 ## Customizing returned values
 
 You can change `complete_opts.items` to change what values will be returned,
-e.g. this list will return both issue keys only and keys with summary in results:
+e.g. this value will make it so only return lines with both issue keys and summary are returned:
 
 ```lua
 items = {
-  { '[%s] ',   { root = { 'key' }, fields = {} } },
   { '[%s] %s', { root = { 'key' }, fields = { 'summary' } } },
 }
 ```
