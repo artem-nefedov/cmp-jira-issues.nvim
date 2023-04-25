@@ -46,6 +46,10 @@ M.setup = function(opts)
     end
   end
 
+  if opts.complete_opts.fields == nil then
+    opts.complete_opts.fields = 'summary,description'
+  end
+
   if opts.complete_opts.items == nil then
     opts.complete_opts.items = {
       { '[%s] ',   { { 'key' } } },

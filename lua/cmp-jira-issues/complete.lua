@@ -43,7 +43,7 @@ M.get_complete_fn = function(complete_opts)
       '--header',
       'Content-Type: application/json',
       '--data-urlencode',
-      'fields=summary,description',
+      'fields=' .. complete_opts.fields,
       '--config',
       complete_opts.curl_config,
       on_exit = function(job)
