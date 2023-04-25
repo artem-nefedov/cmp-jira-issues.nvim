@@ -29,6 +29,7 @@ require('lazy').setup({
   },
 })
 ```
+
 ## Curl config
 
 You must have a curl config file (default: `~/.jira-curl-config`), which must
@@ -97,7 +98,6 @@ require('cmp-jira-issues').setup({
   end,
   complete_opts = {
     curl_config = '~/.jira-curl-config', -- value is passed to `:h expand()`
-    item_format = '[%s] ', -- must contain exactly one %s in the string
     get_cache = function(_, _)
       return vim.g.cached_jira_issues
     end,

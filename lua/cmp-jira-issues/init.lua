@@ -34,10 +34,6 @@ M.setup = function(opts)
 
   opts.complete_opts.curl_config = vim.fn.expand(opts.complete_opts.curl_config or '~/.jira-curl-config')
 
-  if opts.complete_opts.item_format == nil then
-    opts.complete_opts.item_format = '[%s] '
-  end
-
   if opts.complete_opts.get_cache == nil then
     opts.complete_opts.get_cache = function(_, _)
       return vim.g.cached_jira_issues
@@ -48,6 +44,13 @@ M.setup = function(opts)
     opts.complete_opts.set_cache = function(_, _, items)
       vim.g.cached_jira_issues = items
     end
+  end
+
+  if opts.complete_opts.items == nil then
+    opts.complete_opts.items = {
+      {'[%s] ', {'key'}},
+      {'[%s] %s', {'key', 'summary'}},
+    }
   end
 
   source.complete = require('cmp-jira-issues.complete').get_complete_fn(opts.complete_opts)

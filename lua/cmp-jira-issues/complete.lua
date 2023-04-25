@@ -47,14 +47,16 @@ M.get_complete_fn = function(complete_opts)
         for _, issue in ipairs(parsed.issues) do
           issue.body = string.gsub(issue.body or '', '\r', '')
 
-          table.insert(items, {
-            label = string.format(complete_opts.item_format, issue.key),
-            documentation = {
-              kind = 'plaintext',
-              value = string.format('[%s] %s\n\n%s', issue.key, issue.fields.summary,
-                issue.fields.description),
-            },
-          })
+          for _, item_format in ipairs(complete_opts.items) do
+            table.insert(items, {
+              label = string.format(item_format[1], table.unpack(item_format[2])),
+              documentation = {
+                kind = 'plaintext',
+                value = string.format('[%s] %s\n\n%s', issue.key, issue.fields.summary,
+                  issue.fields.description),
+              },
+            })
+          end
         end
 
         callback({ items = items, isIncomplete = false })
