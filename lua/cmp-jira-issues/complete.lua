@@ -63,15 +63,13 @@ M.get_complete_fn = function(complete_opts)
 
         local items = {}
         for _, issue in ipairs(parsed.issues) do
-          issue.body = string.gsub(issue.body or '', '\r', '')
-
           for _, item_format in ipairs(complete_opts.items) do
             table.insert(items, {
               label = string.format(item_format[1], unpack(get_fields(issue, item_format[2]))),
               documentation = {
                 kind = 'plaintext',
-                value = string.format('[%s] %s\n\n%s', issue.key, issue.fields.summary,
-                  issue.fields.description),
+                value = string.format('[%s] %s\n\n%s', issue.key, (issue.fields or {}).summary or '',
+                  string.gsub((issue.fields or {}).description or '', '\r', '')),
               },
             })
           end
