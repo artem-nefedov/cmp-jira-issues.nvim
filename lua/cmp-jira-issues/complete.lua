@@ -4,6 +4,17 @@ local Job = require('plenary.job')
 
 local enabled = true
 
+local get_fields = function(issue, items_from)
+  local t = {}
+  for _, item_key in ipairs(items_from.root) do
+    table.insert(t, issue[item_key])
+  end
+  for _, item_key in ipairs(items_from.fields) do
+    table.insert(t, issue.fields[item_key])
+  end
+  return t
+end
+
 M.get_complete_fn = function(complete_opts)
   return function(self, _, callback)
     if not enabled then
@@ -49,7 +60,7 @@ M.get_complete_fn = function(complete_opts)
 
           for _, item_format in ipairs(complete_opts.items) do
             table.insert(items, {
-              label = string.format(item_format[1], table.unpack(item_format[2])),
+              label = string.format(item_format[1], unpack(get_fields(issue, item_format[2]))),
               documentation = {
                 kind = 'plaintext',
                 value = string.format('[%s] %s\n\n%s', issue.key, issue.fields.summary,

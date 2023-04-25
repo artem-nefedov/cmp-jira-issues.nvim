@@ -98,6 +98,9 @@ require('cmp-jira-issues').setup({
   end,
   complete_opts = {
     curl_config = '~/.jira-curl-config', -- value is passed to `:h expand()`
+    items = { -- what fields to lookup and how to format them
+      { '[%s] %s', { root = { 'key' }, fields = { 'summary' } } },
+    }
     get_cache = function(_, _)
       return vim.g.cached_jira_issues
     end,
@@ -108,16 +111,30 @@ require('cmp-jira-issues').setup({
 })
 ```
 
+## Customizing returned values
+
+You can change `complete_opts.items` to change what values will be returned,
+e.g. this list will return both issue keys only and keys with summary in results:
+
+```lua
+items = {
+  { '[%s] ',   { root = { 'key' }, fields = {} } },
+  { '[%s] %s', { root = { 'key' }, fields = { 'summary' } } },
+}
+```
+
+Number of `%s` in LHS must match total number of defined elements in RHS.
+
 ## Caching
 
 By default, response from server is cached globally for the entire session duration,
 and `JiraClearCache` user command is provided to clear cached results.
 
 You can change the behavior by implementing your own caching mechanics using
-`get_cache`, `set_cache`, and `clear_cache` callbacks.
+`complete_opts.get_cache`, `complete_opt.set_cache`, and `clear_cache` callbacks.
 
-- `get_cache` receives 2 arguments: `self` table and `bufnr` integer
-- `set_cache` receives 3 arguments: `self` table, `bufnr` integer, and `items` table
+- `complete_opts.get_cache` receives 2 arguments: `self` table and `bufnr` integer
+- `complete_opt.set_cache` receives 3 arguments: `self` table, `bufnr` integer, and `items` table
 - `clear_cache` doesn't receive anything and gets called by `JiraClearCache` command
 
 To implement buffer local cache, use the following definitions
@@ -133,7 +150,7 @@ set_cache = function(self, bufnr, items)
 end
 ```
 
-To disable cache completely, pass `get_cache` function that always returns `nil`.
+To disable cache completely, pass `complete_opts.get_cache` function that always returns `nil`.
 
 ## Troubleshooting
 
