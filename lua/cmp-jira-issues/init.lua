@@ -48,8 +48,8 @@ M.setup = function(opts)
 
   if opts.complete_opts.items == nil then
     opts.complete_opts.items = {
-      { '[%s] ',   { root = { 'key' }, fields = {} } },
-      { '[%s] %s', { root = { 'key' }, fields = { 'summary' } } },
+      { '[%s] ',   { { 'key' } } },
+      { '[%s] %s', { { 'key' }, { 'fields', 'summary' } } },
     }
   end
 

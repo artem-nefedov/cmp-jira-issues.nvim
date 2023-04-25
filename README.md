@@ -99,8 +99,8 @@ require('cmp-jira-issues').setup({
   complete_opts = {
     curl_config = '~/.jira-curl-config', -- value is passed to `:h expand()`
     items = { -- what fields to lookup and how to format them
-      { '[%s] ',   { root = { 'key' }, fields = {} } }, -- keys only
-      { '[%s] %s', { root = { 'key' }, fields = { 'summary' } } }, -- keys + summary
+      { '[%s] ',   { { 'key' } } }, -- key only
+      { '[%s] %s', { { 'key' }, { 'fields', 'summary' } } }, -- key + summary
     }
     get_cache = function(_, _)
       return vim.g.cached_jira_issues
@@ -119,11 +119,15 @@ e.g. this value will make it so only return lines with both issue keys and summa
 
 ```lua
 items = {
-  { '[%s] %s', { root = { 'key' }, fields = { 'summary' } } },
+  { '[%s] %s', { { 'key' }, { 'fields', 'summary' } } },
 }
 ```
 
 Number of `%s` in LHS must match total number of defined elements in RHS.
+
+Note that RHS is a list which itself contains other lists of values that correspond
+to structure of returned "issue" JSON object, with arbitrary depth,
+e.g. `{ 'fields', 'summary' }` means get value from `issue.fields.summary`.
 
 ## Caching
 

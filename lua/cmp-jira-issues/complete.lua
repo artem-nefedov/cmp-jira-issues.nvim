@@ -4,13 +4,20 @@ local Job = require('plenary.job')
 
 local enabled = true
 
+local function extract_field(parent, field)
+  if #field == 1 then
+    return parent[field[1]]
+  else
+    local t = vim.deepcopy(field)
+    table.remove(t, 1)
+    return extract_field(parent[field[1]], t)
+  end
+end
+
 local get_fields = function(issue, items_from)
   local t = {}
-  for _, item_key in ipairs(items_from.root) do
-    table.insert(t, issue[item_key])
-  end
-  for _, item_key in ipairs(items_from.fields) do
-    table.insert(t, issue.fields[item_key])
+  for _, item_key in ipairs(items_from) do
+    table.insert(t, extract_field(issue, item_key))
   end
   return t
 end
