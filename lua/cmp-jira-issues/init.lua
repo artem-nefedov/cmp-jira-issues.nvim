@@ -33,6 +33,7 @@ M.setup = function(opts)
   end
 
   opts.complete_opts.curl_config = vim.fn.expand(opts.complete_opts.curl_config or '~/.jira-curl-config')
+  vim.g.jira_curl_config = opts.complete_opts.curl_config
 
   if opts.complete_opts.get_cache == nil then
     opts.complete_opts.get_cache = function(_, _)
