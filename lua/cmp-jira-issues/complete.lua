@@ -32,7 +32,7 @@ M.get_complete_fn = function(complete_opts)
 
     local cached = complete_opts.get_cache(self, bufnr)
     if cached ~= nil then
-      callback({ items = cached, isIncomplete = false })
+      callback({ items = cached, is_incomplete_backward = false, is_incomplete_forward = false })
       return
     end
 
@@ -75,7 +75,19 @@ M.get_complete_fn = function(complete_opts)
           end
         end
 
-        callback({ items = items, isIncomplete = false })
+        callback({
+          items = items,
+          -- Whether blink.cmp should request items when deleting characters
+          -- from the keyword (i.e. "foo|" -> "fo|")
+          -- Note that any non-alphanumeric characters will always request
+          -- new items (excluding `-` and `_`)
+          is_incomplete_backward = false,
+          -- Whether blink.cmp should request items when adding characters
+          -- to the keyword (i.e. "fo|" -> "foo|")
+          -- Note that any non-alphanumeric characters will always request
+          -- new items (excluding `-` and `_`)
+          is_incomplete_forward = false,
+        })
 
         complete_opts.set_cache(self, bufnr, items)
       end,

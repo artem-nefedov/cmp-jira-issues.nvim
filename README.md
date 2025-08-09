@@ -3,14 +3,14 @@
 Extend nvim-cmp to auto-complete Jira issue keys.
 
 Based on [cmp_gh_source](https://github.com/tjdevries/config_manager/blob/master/xdg_config/nvim/after/plugin/cmp_gh_source.lua)
-example by TJ DeVries.
+example by TJ DeVries and [blink source boilerplate example](https://cmp.saghen.dev/development/source-boilerplate.html).
 
 ## Prerequisites
 
 - Using NeoVim (tested with 0.9.0 on unix-like environment)
 - Access to Jira-Server REST API (not tested with Jira-Cloud)
 - [curl](https://curl.se/) is installed and is available in `$PATH`
-- [nvim-cmp](https://github.com/hrsh7th/nvim-cmp) and [plenary.nvim](https://github.com/nvim-lua/plenary.nvim) are installed
+- [blink.cmp](https://github.com/saghen/blink.cmp) and [plenary.nvim](https://github.com/nvim-lua/plenary.nvim) are installed
   (both must be loaded before `setup` is called)
 
 ## Installation
@@ -24,7 +24,7 @@ require('lazy').setup({
     'artem-nefedov/cmp-jira-issues.nvim',
     dependencies = { -- this is not required if you already install those plugins
       'nvim-lua/plenary.nvim',
-      'hrsh7th/nvim-cmp',
+      'saghen/blink.cmp',
     },
   },
 })
@@ -55,61 +55,48 @@ user = "username:password"
 
 ## Setup
 
-Make sure to call `setup` when plenary and nvim-cmp are already loaded.
-
-### Default configuration
-
-Create/update ".lua" file in `~/.config/nvim/after/plugin/` with contents:
+Below is the example how to add the source to blink.cmp.
+It also show available options for customization with default values.
 
 ```lua
-require('cmp-jira-issues').setup({})
-```
-
-Don't forget to add completion source (default: `jira_issues`) to cmp `setup`, e.g.:
-
-```lua
-local cmp = require('cmp')
-
-cmp.setup({
-  -- other options
+require('blink.cmp').setup({
   sources = {
-    { name = 'jira_issues' },
-    -- other sources
-  },
-})
-```
-
-### Custom custom configuration
-
-Below you can see available fields (shown with values set to match defaults):
-
-```lua
-require('cmp-jira-issues').setup({
-  source_name = 'jira_issues',
-  get_trigger_characters = function() -- on which characters completion is triggered
-    return { '[' }
-  end,
-  is_available = function() -- determine whether source is available for current buffer
-    return vim.bo.filetype == 'gitcommit' or
-        (vim.bo.filetype == 'markdown' and vim.fs.basename(vim.api.nvim_buf_get_name(0)) == 'CHANGELOG.md')
-  end,
-  clear_cache = function() -- set to boolean false value to disable user command creation
-    vim.g.cached_jira_issues = nil
-  end,
-  complete_opts = {
-    curl_config = '~/.jira-curl-config', -- value is passed to `:h expand()`
-    fields = 'summary,description', -- what fields to fetch from jira api
-    items = { -- what fields to lookup in response and how to format them
-      { '[%s] ',   { { 'key' } } }, -- key only
-      { '[%s] %s', { { 'key' }, { 'fields', 'summary' } } }, -- key + summary
+    default = { 'lsp', 'path', 'snippets', 'lazydev', 'jira' }, -- specify here...
+    providers = {
+      lazydev = { module = 'lazydev.integrations.blink', score_offset = 100 },
+      jira = { -- and here
+        name = 'Jira',
+        module = 'cmp-jira-issues',
+        opts = { -- the options are shown with default values (no need to set explicitly)
+          get_trigger_characters = function() -- on which characters completion is triggered
+            return { '[' }
+          end,
+          enabled = function() -- determine whether source is available for current buffer
+            return vim.bo.filetype == 'gitcommit' or
+                (vim.bo.filetype == 'markdown' and vim.fs.basename(vim.api.nvim_buf_get_name(0)) == 'CHANGELOG.md')
+          end,
+          clear_cache = function() -- set to boolean false value to disable user command creation
+            vim.g.cached_jira_issues = nil
+          end,
+          complete_opts = {
+            curl_config = '~/.jira-curl-config', -- value is passed to `:h expand()`
+            fields = 'summary,description', -- what fields to fetch from jira api
+            items = { -- what fields to lookup in response and how to format them
+              { '[%s] ',   { { 'key' } } }, -- key only
+              { '[%s] %s', { { 'key' }, { 'fields', 'summary' } } }, -- key + summary
+            },
+            get_cache = function(_, _)
+              return vim.g.cached_jira_issues
+            end,
+            set_cache = function(_, _, items)
+              vim.g.cached_jira_issues = items
+            end,
+          },
+        },
+      },
     },
-    get_cache = function(_, _)
-      return vim.g.cached_jira_issues
-    end,
-    set_cache = function(_, _, items)
-      vim.g.cached_jira_issues = items
-    end,
   },
+  -- ... other fields for blink.cmp setup
 })
 ```
 
