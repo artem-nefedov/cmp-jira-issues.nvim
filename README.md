@@ -1,6 +1,6 @@
 # cmp-jira-issues
 
-Extend nvim-cmp to auto-complete Jira issue keys.
+Extend blink.cmp to auto-complete Jira issue keys.
 
 Based on [cmp_gh_source](https://github.com/tjdevries/config_manager/blob/master/xdg_config/nvim/after/plugin/cmp_gh_source.lua)
 example by TJ DeVries and [blink source boilerplate example](https://cmp.saghen.dev/development/source-boilerplate.html).
