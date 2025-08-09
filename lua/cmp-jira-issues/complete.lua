@@ -45,7 +45,7 @@ M.get_complete_fn = function(complete_opts)
       '--config',
       complete_opts.curl_config,
     }, { text = true }, function(obj)
-      if obj.code =~ 0 then
+      if obj.code ~= 0 then
         print('curl returned ' .. obj.code)
         enabled = false
         return
