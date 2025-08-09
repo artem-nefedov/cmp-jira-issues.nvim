@@ -1,7 +1,5 @@
 local M = {}
 
-local Job = require('plenary.job')
-
 local enabled = true
 
 local function extract_field(parent, field)
@@ -36,7 +34,7 @@ M.get_complete_fn = function(complete_opts)
       return
     end
 
-    Job:new({
+    vim.system({
       'curl',
       '--silent',
       '--get',
@@ -46,52 +44,56 @@ M.get_complete_fn = function(complete_opts)
       'fields=' .. complete_opts.fields,
       '--config',
       complete_opts.curl_config,
-      on_exit = function(job)
-        local result = job:result()
-        local ok, parsed = pcall(vim.json.decode, table.concat(result, ''))
+    }, { text = true }, function(obj)
+      if obj.code =~ 0 then
+        print('curl returned ' .. obj.code)
+        enabled = false
+        return
+      end
 
-        if not ok then
-          enabled = false
-          print('bad response from curl after querying jira')
-          return
+      local ok, parsed = pcall(vim.json.decode, obj.stdout)
+
+      if not ok then
+        enabled = false
+        print('bad response from curl after querying jira')
+        return
+      end
+
+      if parsed == nil then -- make linter happy
+        enabled = false
+        return
+      end
+
+      local items = {}
+      for _, issue in ipairs(parsed.issues) do
+        for _, item_format in ipairs(complete_opts.items) do
+          table.insert(items, {
+            label = string.format(item_format[1], unpack(get_fields(issue, item_format[2]))),
+            documentation = {
+              kind = 'plaintext',
+              value = string.format('[%s] %s\n\n%s', issue.key, (issue.fields or {}).summary or '',
+                string.gsub((issue.fields or {}).description or '', '\r', '')),
+            },
+          })
         end
+      end
 
-        if parsed == nil then -- make linter happy
-          enabled = false
-          return
-        end
+      callback({
+        items = items,
+        -- Whether blink.cmp should request items when deleting characters
+        -- from the keyword (i.e. "foo|" -> "fo|")
+        -- Note that any non-alphanumeric characters will always request
+        -- new items (excluding `-` and `_`)
+        is_incomplete_backward = false,
+        -- Whether blink.cmp should request items when adding characters
+        -- to the keyword (i.e. "fo|" -> "foo|")
+        -- Note that any non-alphanumeric characters will always request
+        -- new items (excluding `-` and `_`)
+        is_incomplete_forward = false,
+      })
 
-        local items = {}
-        for _, issue in ipairs(parsed.issues) do
-          for _, item_format in ipairs(complete_opts.items) do
-            table.insert(items, {
-              label = string.format(item_format[1], unpack(get_fields(issue, item_format[2]))),
-              documentation = {
-                kind = 'plaintext',
-                value = string.format('[%s] %s\n\n%s', issue.key, (issue.fields or {}).summary or '',
-                  string.gsub((issue.fields or {}).description or '', '\r', '')),
-              },
-            })
-          end
-        end
-
-        callback({
-          items = items,
-          -- Whether blink.cmp should request items when deleting characters
-          -- from the keyword (i.e. "foo|" -> "fo|")
-          -- Note that any non-alphanumeric characters will always request
-          -- new items (excluding `-` and `_`)
-          is_incomplete_backward = false,
-          -- Whether blink.cmp should request items when adding characters
-          -- to the keyword (i.e. "fo|" -> "foo|")
-          -- Note that any non-alphanumeric characters will always request
-          -- new items (excluding `-` and `_`)
-          is_incomplete_forward = false,
-        })
-
-        complete_opts.set_cache(self, bufnr, items)
-      end,
-    }):start()
+      complete_opts.set_cache(self, bufnr, items)
+    end)
   end
 end
 

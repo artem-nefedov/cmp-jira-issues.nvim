@@ -10,8 +10,7 @@ example by TJ DeVries and [blink source boilerplate example](https://cmp.saghen.
 - Using NeoVim (tested with 0.9.0 on unix-like environment)
 - Access to Jira-Server REST API (not tested with Jira-Cloud)
 - [curl](https://curl.se/) is installed and is available in `$PATH`
-- [blink.cmp](https://github.com/saghen/blink.cmp) and [plenary.nvim](https://github.com/nvim-lua/plenary.nvim) are installed
-  (both must be loaded before `setup` is called)
+- [blink.cmp](https://github.com/saghen/blink.cmp) is installed
 
 ## Installation
 
@@ -21,10 +20,9 @@ Minimal installation example for [lazy.nvim](https://github.com/folke/lazy.nvim)
 ```lua
 require('lazy').setup({
   {
-    'artem-nefedov/cmp-jira-issues.nvim',
-    dependencies = { -- this is not required if you already install those plugins
-      'nvim-lua/plenary.nvim',
-      'saghen/blink.cmp',
+    'saghen/blink.cmp',
+    dependencies = {
+      'artem-nefedov/cmp-jira-issues.nvim',
     },
   },
 })
