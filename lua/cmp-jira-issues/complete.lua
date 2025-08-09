@@ -1,7 +1,5 @@
 local M = {}
 
-local enabled = true
-
 local function extract_field(parent, field)
   if #field == 1 then
     return parent[field[1]]
@@ -22,13 +20,9 @@ end
 
 M.get_complete_fn = function(complete_opts)
   return function(self, _, callback)
-    if not enabled then
-      return
-    end
-
     local bufnr = vim.api.nvim_get_current_buf()
-
     local cached = complete_opts.get_cache(self, bufnr)
+
     if cached ~= nil then
       callback({ items = cached, is_incomplete_backward = false, is_incomplete_forward = false })
       return
@@ -47,20 +41,23 @@ M.get_complete_fn = function(complete_opts)
     }, { text = true }, function(obj)
       if obj.code ~= 0 then
         print('curl returned ' .. obj.code)
-        enabled = false
+        complete_opts.set_cache(self, bufnr, {})
+        callback({ items = {}, is_incomplete_backward = false, is_incomplete_forward = false })
         return
       end
 
       local ok, parsed = pcall(vim.json.decode, obj.stdout)
 
       if not ok then
-        enabled = false
         print('bad response from curl after querying jira')
+        complete_opts.set_cache(self, bufnr, {})
+        callback({ items = {}, is_incomplete_backward = false, is_incomplete_forward = false })
         return
       end
 
       if parsed == nil then -- make linter happy
-        enabled = false
+        complete_opts.set_cache(self, bufnr, {})
+        callback({ items = {}, is_incomplete_backward = false, is_incomplete_forward = false })
         return
       end
 
