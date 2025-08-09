@@ -1,5 +1,7 @@
 local source = {}
 
+local cache
+
 -- `opts` table comes from `sources.providers.your_provider.opts`
 -- You may also accept a second argument `config`, to get the full
 -- `sources.providers.your_provider` table
@@ -20,7 +22,7 @@ function source.new(opts)
   end
 
   local clear_cache = opts.clear_cache ~= nil and opts.clear_cache or function()
-    vim.g.cached_jira_issues = nil
+    cache = nil
   end
 
   if opts.complete_opts == nil then
@@ -31,13 +33,13 @@ function source.new(opts)
 
   if opts.complete_opts.get_cache == nil then
     opts.complete_opts.get_cache = function(_, _)
-      return vim.g.cached_jira_issues
+      return cache
     end
   end
 
   if opts.complete_opts.set_cache == nil then
     opts.complete_opts.set_cache = function(_, _, items)
-      vim.g.cached_jira_issues = items
+      cache = items
     end
   end
 

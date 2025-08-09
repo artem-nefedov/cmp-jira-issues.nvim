@@ -74,7 +74,7 @@ require('blink.cmp').setup({
                 (vim.bo.filetype == 'markdown' and vim.fs.basename(vim.api.nvim_buf_get_name(0)) == 'CHANGELOG.md')
           end,
           clear_cache = function() -- set to boolean false value to disable user command creation
-            vim.g.cached_jira_issues = nil
+            cache = nil -- plugin-local var
           end,
           complete_opts = {
             curl_config = '~/.jira-curl-config', -- value is passed to `:h expand()`
@@ -84,10 +84,10 @@ require('blink.cmp').setup({
               { '[%s] %s', { { 'key' }, { 'fields', 'summary' } } }, -- key + summary
             },
             get_cache = function(_, _)
-              return vim.g.cached_jira_issues
+              return cache
             end,
             set_cache = function(_, _, items)
-              vim.g.cached_jira_issues = items
+              cache = items
             end,
           },
         },
