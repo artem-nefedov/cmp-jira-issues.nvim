@@ -54,51 +54,58 @@ user = "username:password"
 ## Setup
 
 Below is the example how to add the source to blink.cmp.
-It also show available options for customization with default values.
 
 ```lua
 require('blink.cmp').setup({
   sources = {
-    default = { 'lsp', 'path', 'snippets', 'lazydev', 'jira' }, -- specify here...
+    default = { 'lsp', 'path', 'snippets', 'lazydev', 'buffer', 'jira' }, -- specify here...
     providers = {
       lazydev = { module = 'lazydev.integrations.blink', score_offset = 100 },
       jira = { -- and here
         name = 'Jira',
         module = 'cmp-jira-issues',
+        opts = {},
         should_show_items = function(ctx) -- show results only after specific character
           return ctx.trigger.initial_character == '['
         end,
-        opts = { -- the options are shown with default values (no need to set explicitly)
-          get_trigger_characters = function() -- on which characters completion is triggered
-            return { '[' }
-          end,
-          enabled = function() -- determine whether source is available for current buffer
-            return vim.bo.filetype == 'gitcommit' or
-                (vim.bo.filetype == 'markdown' and vim.fs.basename(vim.api.nvim_buf_get_name(0)) == 'CHANGELOG.md')
-          end,
-          clear_cache = function() -- set to boolean false value to disable user command creation
-            cache = nil -- plugin-local var
-          end,
-          complete_opts = {
-            curl_config = '~/.jira-curl-config', -- value is passed to `:h expand()`
-            fields = 'summary,description', -- what fields to fetch from jira api
-            items = { -- what fields to lookup in response and how to format them
-              { '[%s] ',   { { 'key' } } }, -- key only
-              { '[%s] %s', { { 'key' }, { 'fields', 'summary' } } }, -- key + summary
-            },
-            get_cache = function(_)
-              return cache
-            end,
-            set_cache = function(_, items)
-              cache = items
-            end,
-          },
-        },
       },
     },
   },
   -- ... other fields for blink.cmp setup
 })
+```
+
+### Available options
+
+Below are all available options with their respective default values.
+
+```lua
+opts = {
+  get_trigger_characters = function() -- on which characters completion is triggered
+    return { '[' }
+  end,
+  enabled = function() -- determine whether source is available for current buffer
+    return vim.bo.filetype == 'gitcommit' or
+        (vim.bo.filetype == 'markdown' and vim.fs.basename(vim.api.nvim_buf_get_name(0)) == 'CHANGELOG.md')
+  end,
+  clear_cache = function() -- set to boolean false value to disable user command creation
+    cache = nil -- plugin-local var
+  end,
+  complete_opts = {
+    curl_config = '~/.jira-curl-config', -- value is passed to `:h expand()`
+    fields = 'summary,description', -- what fields to fetch from jira api
+    items = { -- what fields to lookup in response and how to format them
+      { '[%s] ',   { { 'key' } } }, -- key only
+      { '[%s] %s', { { 'key' }, { 'fields', 'summary' } } }, -- key + summary
+    },
+    get_cache = function(_)
+      return cache
+    end,
+    set_cache = function(_, items)
+      cache = items
+    end,
+  },
+}
 ```
 
 ## Customizing returned values
