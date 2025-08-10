@@ -38,58 +38,60 @@ M.get_complete_fn = function(complete_opts)
       'fields=' .. complete_opts.fields,
       '--config',
       complete_opts.curl_config,
-    }, { text = true }, function(obj)
-      if obj.code ~= 0 then
-        print('curl returned ' .. obj.code)
-        complete_opts.set_cache(self, bufnr, {})
-        callback({ items = {}, is_incomplete_backward = false, is_incomplete_forward = false })
-        return
-      end
-
-      local ok, parsed = pcall(vim.json.decode, obj.stdout)
-
-      if not ok then
-        print('bad response from curl after querying jira')
-        complete_opts.set_cache(self, bufnr, {})
-        callback({ items = {}, is_incomplete_backward = false, is_incomplete_forward = false })
-        return
-      end
-
-      if parsed == nil then -- make linter happy
-        complete_opts.set_cache(self, bufnr, {})
-        callback({ items = {}, is_incomplete_backward = false, is_incomplete_forward = false })
-        return
-      end
-
-      local items = {}
-      for _, issue in ipairs(parsed.issues) do
-        for _, item_format in ipairs(complete_opts.items) do
-          table.insert(items, {
-            label = string.format(item_format[1], unpack(get_fields(issue, item_format[2]))),
-            documentation = {
-              kind = 'plaintext',
-              value = string.format('[%s] %s\n\n%s', issue.key, (issue.fields or {}).summary or '',
-                string.gsub((issue.fields or {}).description or '', '\r', '')),
-            },
-          })
+    }, nil, function(obj)
+      vim.schedule(function()
+        if obj.code ~= 0 then
+          print('curl returned ' .. obj.code)
+          complete_opts.set_cache(self, bufnr, {})
+          callback({ items = {}, is_incomplete_backward = false, is_incomplete_forward = false })
+          return
         end
-      end
 
-      callback({
-        items = items,
-        -- Whether blink.cmp should request items when deleting characters
-        -- from the keyword (i.e. "foo|" -> "fo|")
-        -- Note that any non-alphanumeric characters will always request
-        -- new items (excluding `-` and `_`)
-        is_incomplete_backward = false,
-        -- Whether blink.cmp should request items when adding characters
-        -- to the keyword (i.e. "fo|" -> "foo|")
-        -- Note that any non-alphanumeric characters will always request
-        -- new items (excluding `-` and `_`)
-        is_incomplete_forward = false,
-      })
+        local ok, parsed = pcall(vim.json.decode, obj.stdout)
 
-      complete_opts.set_cache(self, bufnr, items)
+        if not ok then
+          print('bad response from curl after querying jira')
+          complete_opts.set_cache(self, bufnr, {})
+          callback({ items = {}, is_incomplete_backward = false, is_incomplete_forward = false })
+          return
+        end
+
+        if parsed == nil then -- make linter happy
+          complete_opts.set_cache(self, bufnr, {})
+          callback({ items = {}, is_incomplete_backward = false, is_incomplete_forward = false })
+          return
+        end
+
+        local items = {}
+        for _, issue in ipairs(parsed.issues) do
+          for _, item_format in ipairs(complete_opts.items) do
+            table.insert(items, {
+              label = string.format(item_format[1], unpack(get_fields(issue, item_format[2]))),
+              documentation = {
+                kind = 'plaintext',
+                value = string.format('[%s] %s\n\n%s', issue.key, (issue.fields or {}).summary or '',
+                  string.gsub((issue.fields or {}).description or '', '\r', '')),
+              },
+            })
+          end
+        end
+
+        callback({
+          items = items,
+          -- Whether blink.cmp should request items when deleting characters
+          -- from the keyword (i.e. "foo|" -> "fo|")
+          -- Note that any non-alphanumeric characters will always request
+          -- new items (excluding `-` and `_`)
+          is_incomplete_backward = false,
+          -- Whether blink.cmp should request items when adding characters
+          -- to the keyword (i.e. "fo|" -> "foo|")
+          -- Note that any non-alphanumeric characters will always request
+          -- new items (excluding `-` and `_`)
+          is_incomplete_forward = false,
+        })
+
+        complete_opts.set_cache(self, bufnr, items)
+      end)
     end)
   end
 end
