@@ -86,10 +86,10 @@ require('blink.cmp').setup({
               { '[%s] ',   { { 'key' } } }, -- key only
               { '[%s] %s', { { 'key' }, { 'fields', 'summary' } } }, -- key + summary
             },
-            get_cache = function(_, _)
+            get_cache = function(_)
               return cache
             end,
-            set_cache = function(_, _, items)
+            set_cache = function(_, items)
               cache = items
             end,
           },
@@ -126,24 +126,9 @@ and `JiraClearCache` user command is provided to clear cached results.
 You can change the behavior by implementing your own caching mechanics using
 `complete_opts.get_cache`, `complete_opt.set_cache`, and `clear_cache` callbacks.
 
-- `complete_opts.get_cache` receives 2 arguments: `self` table and `bufnr` integer
-- `complete_opt.set_cache` receives 3 arguments: `self` table, `bufnr` integer, and `items` table
+- `complete_opts.get_cache` receives 1 argument: `self` table
+- `complete_opt.set_cache` receives 2 arguments: `self` table and `items` table
 - `clear_cache` doesn't receive anything and gets called by `JiraClearCache` command
-
-Furthermore, `self` table has child `cache` table created by default.
-
-To implement buffer local cache, use the following definitions
-(note that it makes `clear_cache` useless - set it to `false` to disable user command creation):
-
-```lua
-get_cache = function(self, bufnr)
-  return self.cache[bufnr]
-end
-
-set_cache = function(self, bufnr, items)
-  self.cache[bufnr] = items
-end
-```
 
 To disable cache completely, pass `complete_opts.get_cache` function that always returns `nil`.
 

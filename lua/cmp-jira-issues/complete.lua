@@ -20,8 +20,7 @@ end
 
 M.get_complete_fn = function(complete_opts)
   return function(self, _, callback)
-    local bufnr = vim.api.nvim_get_current_buf()
-    local cached = complete_opts.get_cache(self, bufnr)
+    local cached = complete_opts.get_cache(self)
 
     if cached ~= nil then
       callback({ items = cached, is_incomplete_backward = false, is_incomplete_forward = false })
@@ -42,7 +41,7 @@ M.get_complete_fn = function(complete_opts)
       vim.schedule(function()
         if obj.code ~= 0 then
           print('curl returned ' .. obj.code)
-          complete_opts.set_cache(self, bufnr, {})
+          complete_opts.set_cache(self, {})
           callback({ items = {}, is_incomplete_backward = false, is_incomplete_forward = false })
           return
         end
@@ -51,13 +50,13 @@ M.get_complete_fn = function(complete_opts)
 
         if not ok then
           print('bad response from curl after querying jira')
-          complete_opts.set_cache(self, bufnr, {})
+          complete_opts.set_cache(self, {})
           callback({ items = {}, is_incomplete_backward = false, is_incomplete_forward = false })
           return
         end
 
         if parsed == nil then -- make linter happy
-          complete_opts.set_cache(self, bufnr, {})
+          complete_opts.set_cache(self, {})
           callback({ items = {}, is_incomplete_backward = false, is_incomplete_forward = false })
           return
         end
@@ -90,7 +89,7 @@ M.get_complete_fn = function(complete_opts)
           is_incomplete_forward = false,
         })
 
-        complete_opts.set_cache(self, bufnr, items)
+        complete_opts.set_cache(self, items)
       end)
     end)
   end

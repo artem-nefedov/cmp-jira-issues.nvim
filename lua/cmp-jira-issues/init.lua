@@ -32,13 +32,13 @@ function source.new(opts)
   opts.complete_opts.curl_config = vim.fn.expand(opts.complete_opts.curl_config or '~/.jira-curl-config')
 
   if opts.complete_opts.get_cache == nil then
-    opts.complete_opts.get_cache = function(_, _)
+    opts.complete_opts.get_cache = function(_)
       return cache
     end
   end
 
   if opts.complete_opts.set_cache == nil then
-    opts.complete_opts.set_cache = function(_, _, items)
+    opts.complete_opts.set_cache = function(_, items)
       cache = items
     end
   end
