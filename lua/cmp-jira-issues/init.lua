@@ -6,7 +6,7 @@ local cache
 -- You may also accept a second argument `config`, to get the full
 -- `sources.providers.your_provider` table
 function source.new(opts)
-  local self = setmetatable({ cache = {} }, { __index = source })
+  local self = setmetatable({}, { __index = source })
 
   if opts.get_trigger_characters ~= false then
     source.get_trigger_characters = opts.get_trigger_characters or function(_)
