@@ -38,7 +38,7 @@ M.get_complete_fn = function(complete_opts)
       'fields=' .. complete_opts.fields,
       '--config',
       complete_opts.curl_config,
-    }, nil, function(obj)
+    }, { text = true }, function(obj)
       vim.schedule(function()
         if obj.code ~= 0 then
           print('curl returned ' .. obj.code)
