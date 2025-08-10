@@ -65,6 +65,9 @@ require('blink.cmp').setup({
       jira = { -- and here
         name = 'Jira',
         module = 'cmp-jira-issues',
+        should_show_items = function(ctx) -- show results only after specific character
+          return ctx.trigger.initial_character == '['
+        end,
         opts = { -- the options are shown with default values (no need to set explicitly)
           get_trigger_characters = function() -- on which characters completion is triggered
             return { '[' }
