@@ -2,12 +2,9 @@
 
 Extend blink.cmp to auto-complete Jira issue keys.
 
-Based on [cmp_gh_source](https://github.com/tjdevries/config_manager/blob/master/xdg_config/nvim/after/plugin/cmp_gh_source.lua)
-example by TJ DeVries and [blink source boilerplate example](https://cmp.saghen.dev/development/source-boilerplate.html).
-
 ## Prerequisites
 
-- Using NeoVim (tested with 0.9.0 on unix-like environment)
+- Using NeoVim (tested with 0.11.x on unix-like environment)
 - Access to Jira-Server REST API (not tested with Jira-Cloud)
 - [curl](https://curl.se/) is installed and is available in `$PATH`
 - [blink.cmp](https://github.com/saghen/blink.cmp) is installed
